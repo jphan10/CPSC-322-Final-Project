@@ -14,14 +14,35 @@ with open("nb_model.pkl", "rb") as model_file:
 
 @app.route("/", methods=["GET", "POST"])
 def index_page():
+    return render_template("index.html")
+
+
+@app.route("/submit", methods=["POST"])
+def submit():
     prediction = ""
     if request.method == "POST":
-        level = request.form["level"]
-        lang = request.form["lang"]
-        tweets = request.form["tweets"]
-        phd = request.form["phd"]
+        elo1_pre = request.form["elo1_pre"]
+        elo2_pre = request.form["elo2_pre"]
+        elo_prob1 = request.form["elo_prob1"]
+        elo_prob2 = request.form["elo_prob2"]
+        team1 = request.form["team1"]
+        team2 = request.form["team2"]
+        score1 = request.form["score1"]
+        score2 = request.form["score2"]
+
+        # Assuming the model expects a list of features
+        features = [
+            elo1_pre,
+            elo2_pre,
+            elo_prob1,
+            elo_prob2,
+            team1,
+            team2,
+            score1,
+            score2,
+        ]
+        prediction = nb_classifier.predict([features])[0]
     print("prediction:", prediction)
-    # goes into templates folder and finds given name
     return render_template("index.html", prediction=prediction)
 
 

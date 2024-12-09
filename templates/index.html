@@ -1,119 +1,39 @@
-<!-- <!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Interview Well Prediction App</title>
-    </head>
-    <body>
-        <form action="/" method="post">
-            <input type="text" name="level"></input><br>
-            <input type="text" name="lang"></input><br>
-            <input type="text" name="tweets"></input><br>
-            <input type="text" name="phd"></input><br>
-            <input type="submit" value="Predict Interviewed Well!"></input>
-          </form>
-          <p>Prediction: {{prediction}}</p>
-    </body>
-</html> -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Input Form</title>
+</head>
+<body>
+    <h1>Enter Match Details</h1>
+    <form action="/submit" method="post">
+        <label for="elo1_pre">Elo1 Pre:</label>
+        <input type="text" id="elo1_pre" name="elo1_pre"><br><br>
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <label for="elo2_pre">Elo2 Pre:</label>
+        <input type="text" id="elo2_pre" name="elo2_pre"><br><br>
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <label for="elo_prob1">Elo Prob1:</label>
+        <input type="text" id="elo_prob1" name="elo_prob1"><br><br>
 
-    <title>Interview Well Prediction App</title>
-    <style>
-        *{
-            padding: 0;
-            margin: 0;
-            box-sizing: border-box;
-        }
-        body{
-            background: rgb(219, 226, 226);
-        }
-        .row{
-            background: white;
-            border-radius: 30px;
-            box-shadow: 12px 12px 22px grey;
-        }
-        img{
-            border-top-left-radius: 30px;
-            border-bottom-left-radius: 30px;
-        }
-        .container {
-            position: relative;
-        }
-        .btn1{
-            width: 100%;
-        }
-        .btn2{
-            width: 57%;
-        }
-        .center1{
-            padding-top: 100px;
-            margin: auto;
-        }
-    </style>
-  </head>
-  <body>
+        <label for="elo_prob2">Elo Prob2:</label>
+        <input type="text" id="elo_prob2" name="elo_prob2"><br><br>
 
-    <section class="Form my-4 mx-4 center1">
-        <div class="container">
-            <div class="row no gutters">
-                <div class="col-lg-5">
-                    <img src="https://content.sportslogos.net/logos/31/691/full/pxl1fzxrw8lbt04ci2mo4kk0p.png" class="img-fluid mt-5" alt="">
-                </div>
-                <div class="col-lg-7 px-5 pt-5">
-                    <h1 class="font-weight-bodl py-3">Interview Predictor</h1>
-                        <form action="/" method="post">
-                            <div class="form-row">
-                                <div class="col-lg-7">
-                                    <input type="text" placeholder="level" name="level" class="form-control my-1 p-2">
-                                </div>
-                            </div>
-                              <div class="form-row">
-                                <div class="col-lg-7">
-                                    <input type="text" placeholder="lang" name="lang" class="form-control my-1 p-2">
-                                </div>
-                            </div>
-                              <div class="form-row">
-                                <div class="col-lg-7">
-                                    <input type="text" placeholder="tweets" name="tweets" class="form-control my-1 p-2">
-                                </div>
-                            </div>
-                              <div class="form-row">
-                                <div class="col-lg-7">
-                                    <input type="text" placeholder="phd" name="phd" class="form-control my-1 p-2">
-                                </div>
-                            </div>
-                              <div class="form-row">
-                                <div class="col-lg-7">
-                                    <button type="submit" width="" class="btn btn-outline-primary mt-3 mb-3 p-2 btn1">Predict Interviewed Well!</button>
-                                </div>
-                            </div>
-                            {% if prediction|string() == "True"|string() %}
-                            <button type="button" class="btn btn-success mb-4 p-2 btn2">{{ prediction }}</button>
+        <label for="team1">Team 1:</label>
+        <input type="text" id="team1" name="team1"><br><br>
 
-                            {% elif prediction|string() == "False"|string() %}
-                            <button type="button" class="btn btn-warning  mb-4 p-2 btn2">{{ prediction }}</button>
-                            {% else %}
-                            <button type="button" class="btn  mb-4 p-2 btn2"></button>
-                            {% endif %}
-                        </form>
-                 </div>
-            </div>
-        </div>
-    </section>
+        <label for="team2">Team 2:</label>
+        <input type="text" id="team2" name="team2"><br><br>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  </body>
+        <label for="score1">Score 1:</label>
+        <input type="text" id="score1" name="score1"><br><br>
+
+        <label for="score2">Score 2:</label>
+        <input type="text" id="score2" name="score2"><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+    <h2>Prediction: {{ prediction }}</h2>
+</body>
 </html>
