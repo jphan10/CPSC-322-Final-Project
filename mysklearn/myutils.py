@@ -1,5 +1,4 @@
 import numpy as np
-import random
 
 
 def train_test_split(table, test_size, rand_seed=None):
@@ -120,47 +119,3 @@ def calculate_winners(table):
             winners.append(0)
 
     return winners
-
-
-def manual_balance_dataset(X, y, method="undersample"):
-    """
-    Balances the dataset using the specified method without external libraries.
-
-    Args:
-        X (list of list): Feature data.
-        y (list): Target labels.
-        method (str): Balancing method ('undersample' or 'oversample').
-
-    Returns:
-        tuple: Balanced X and y.
-    """
-    # Combine features and labels into a single dataset
-    data = [(x, label) for x, label in zip(X, y)]
-
-    # Separate by class
-    class_0 = [row for row in data if row[1] == 0]
-    class_1 = [row for row in data if row[1] == 1]
-
-    # Balance the dataset
-    if method == "undersample":
-        # Undersample the majority class
-        if len(class_0) > len(class_1):
-            class_0 = random.sample(class_0, len(class_1))
-        else:
-            class_1 = random.sample(class_1, len(class_0))
-    elif method == "oversample":
-        # Oversample the minority class
-        if len(class_0) < len(class_1):
-            class_0 = class_0 + random.choices(class_0, k=len(class_1) - len(class_0))
-        else:
-            class_1 = class_1 + random.choices(class_1, k=len(class_0) - len(class_1))
-    else:
-        raise ValueError("Invalid method. Choose 'undersample' or 'oversample'.")
-
-    # Combine the balanced classes and shuffle
-    balanced_data = class_0 + class_1
-    random.shuffle(balanced_data)
-
-    # Split back into features and labels
-    X_balanced, y_balanced = zip(*balanced_data)
-    return list(X_balanced), list(y_balanced)
