@@ -247,10 +247,6 @@ class MyNaiveBayesClassifier:
                 for value, count in value_dict.items():
                     self.posteriors[label][attr_idx][value] = count / float(class_count)
 
-        # Debug prints
-        print("Priors:", self.priors)
-        print("Posteriors:", self.posteriors)
-
     def predict(self, X_test):
         """Makes predictions for test instances in X_test.
 

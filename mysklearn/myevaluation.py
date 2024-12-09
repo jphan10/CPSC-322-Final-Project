@@ -425,3 +425,53 @@ def binary_f1_score(y_true, y_pred, labels=None, pos_label=None):
         return 0.0
 
     return 2 * (precision * recall) / (precision + recall)
+
+
+def evaluate_classifier(classifier, X_train, y_train, X_test, y_test, classifier_name):
+    """
+    Evaluates a classifier using separate training and testing datasets.
+
+    Args:
+        classifier (obj): The classifier to evaluate (must implement fit and predict).
+        X_train (list of list): The training feature set.
+        y_train (list): The training labels.
+        X_test (list of list): The testing feature set.
+        y_test (list): The testing labels.
+        classifier_name (str): The name of the classifier being evaluated.
+
+    Returns:
+        None: Prints evaluation results.
+    """
+    print(f"\n=== {classifier_name} ===")
+
+    # Determine the unique labels in the dataset
+    unique_labels = list(set(y_train + y_test))
+
+    # Train the classifier on the training set
+    classifier.fit(X_train, y_train)
+
+    # Make predictions on the test set
+    y_pred = classifier.predict(X_test)
+
+    # Calculate evaluation metrics
+    acc = accuracy_score(y_test, y_pred)
+    error_rate = 1 - acc
+    conf_matrix = confusion_matrix(y_test, y_pred, labels=unique_labels)
+    precision = binary_precision_score(
+        y_test, y_pred, labels=unique_labels, pos_label=unique_labels[0]
+    )
+    recall = binary_recall_score(
+        y_test, y_pred, labels=unique_labels, pos_label=unique_labels[0]
+    )
+    f1 = binary_f1_score(
+        y_test, y_pred, labels=unique_labels, pos_label=unique_labels[0]
+    )
+
+    # Print the evaluation metrics
+    print(f"Evaluation results for {classifier_name}:")
+    print(f"Accuracy: {acc:.2f}")
+    print(f"Error Rate: {error_rate:.2f}")
+    print(f"Precision: {precision:.2f}")
+    print(f"Recall: {recall:.2f}")
+    print(f"F1 Score: {f1:.2f}")
+    print(f"Confusion Matrix:\n{conf_matrix}")
