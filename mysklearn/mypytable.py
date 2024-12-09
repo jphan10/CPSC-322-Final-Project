@@ -90,6 +90,26 @@ class MyPyTable:
 
         return ret_col
 
+    def add_column(self, col_name, values):
+        """Adds new column to the table
+
+        Args:
+            col_name (str): name of new column
+            values (list): list of values for new column
+        """
+        if col_name in self.column_names:
+            raise ValueError("This column already exists!")
+
+        if len(values) != len(self.data):
+            raise ValueError(
+                "The number of values must match the number of rows in the table."
+            )
+
+        self.column_names.append(col_name)
+
+        for row, value in zip(self.data, values):
+            row.append(value)
+
     def convert_to_numeric(self):
         """Try to convert each value in the table to a numeric type (float).
 
