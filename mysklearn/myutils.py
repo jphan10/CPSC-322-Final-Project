@@ -83,3 +83,39 @@ def normalize_data(data, min_values, max_values):
             normalized_row.append(normalized_value)
         normalized_data.append(normalized_row)
     return normalized_data
+
+
+def calculate_winners(table):
+    """Calculates the winners of the nba dataset
+
+    Args:
+        table (MyPyTable): NBA dataset
+
+    Returns:
+        winners (list(ints)): returns winners of match, if team1 wins = 1, if team2 wins = 0
+    """
+    col1 = "score1"
+    col2 = "score2"
+
+    if col1 not in table.column_names or col2 not in table.column_names:
+        ValueError("There are no scores in this dataset")
+
+    col1_index = table.column_names.index(col1)
+    col2_index = table.column_names.index(col2)
+
+    winners = []
+
+    for row in table.data:
+        score1 = row[col1_index]
+        score2 = row[col2_index]
+
+        # Error check to see if any scores are empty
+        if score1 is None or score2 is None:
+            ValueError("One of the scores in null!")
+
+        if score1 > score2:
+            winners.append(1)
+        else:
+            winners.append(0)
+
+    return winners
