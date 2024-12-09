@@ -6,10 +6,11 @@ Programming Assignment #4
 
 Description: This program practices making table joins, from PA2
 """
-from mysklearn import myutils
+
 import copy
 import csv
 from tabulate import tabulate
+import random
 
 
 # required functions/methods are noted with TODOs
@@ -111,6 +112,46 @@ class MyPyTable:
         self.data = [
             row for i, row in enumerate(self.data) if i not in row_indexes_to_drop
         ]
+
+    def drop_duplicate_seasons(self, year):
+        """Prevents data leaks by removing rows from the same season
+
+        Args:
+            year (int): year of season we want to drop
+        """
+
+        col_index = self.column_names.index("season")
+
+        drop_indices = []
+
+        for i in range(len(self.data)):
+            if self.data[i][col_index] == year:
+                drop_indices.append(i)
+
+        self.drop_rows(drop_indices)
+
+    def random_down_sample(self, num_rows, rand_seed=1010):
+        """Randomly samples rows from dataset, returns a new MyPyTable containing sampled rows.
+
+        Args:
+            rand_seed (int): integer that will set random seed
+            num_rows (int): number of rows left in down sampled dataset
+
+        Returns:
+            MyPyTable: return sorted new MyPyTable containing new dataset with num_rows rows
+        """
+
+        # Seed random
+        random.seed(rand_seed)
+
+        # Shuffle indices
+        sampled_indices = random.sample(range(len(self.data)), num_rows)
+
+        # Extract the rows from sampled_indices
+        sampled_data = [self.data[i] for i in sampled_indices]
+
+        # Return a new MyPyTable with downsampled data
+        return MyPyTable(self.column_names, sampled_data)
 
     def load_from_file(self, filename):
         """Load column names and data from a CSV file.
