@@ -403,7 +403,9 @@ class MyDecisionTreeClassifier:
 
             # Recur for each partition
             remaining_attributes = [attr for attr in attributes if attr != best_attr]
-            for value, (subset_data, subset_labels) in sorted(partitions.items()):
+            for value, (subset_data, subset_labels) in sorted(
+                partitions.items(), key=lambda x: str(x[0])
+            ):
                 subtree = tdidt(subset_data, subset_labels, remaining_attributes)
                 tree.append(["Value", value, subtree])
 
@@ -543,3 +545,117 @@ class MyDecisionTreeClassifier:
             print(f".pdf file saved to: {pdf_fname}")
         except Exception as e:
             print(f"Error generating files: {e}")
+
+
+def compute_bootstrapped_sample(table):
+    n = len(table)
+    sampled_indexes = [np.random.randint(0, n) for _ in range(n)]
+    sample = [table[index] for index in sampled_indexes]
+    out_of_bag_indexes = [index for index in range(n) if index not in sampled_indexes]
+    out_of_bag_sample = [table[index] for index in out_of_bag_indexes]
+    return sample, out_of_bag_sample
+
+
+def compute_random_subset(values, num_values):
+    values_copy = values[:]  # Create a shallow copy
+    np.random.shuffle(values_copy)
+    return values_copy[:num_values]
+
+
+class MyRandomForestClassifier:
+    def __init__(self, n=20, m="sqrt", f=None, M=None, random_state=None):
+        """Initializer for MyRandomForestClassifier.
+
+        Args:
+            n (int): The number of trees in the forest.
+            m (str or int): The number of features to consider when looking for the best split.
+            f (int): The total number of features in the dataset.
+            M (int): The number of selected trees based on validation accuracy.
+            random_state (int): Seed for the random number generator.
+        """
+        self.n = n
+        self.m = m
+        self.f = f
+        self.M = M
+        self.random_state = random_state
+        self.trees = []
+        self.feature_indices = []
+        self.validation_accuracies = []
+
+    def fit(self, X_train, y_train):
+        """Fits the random forest classifier to the training data.
+
+        Args:
+            X_train (list of list of obj): The list of training instances (samples).
+            y_train (list of obj): The target y values (parallel to X_train).
+        """
+        np.random.seed(self.random_state)
+        n_samples = len(X_train)
+        n_features = self.f if self.f is not None else len(X_train[0])
+
+        for _ in range(self.n):
+            # Bootstrap sampling
+            bootstrap_sample, oob_sample = compute_bootstrapped_sample(
+                list(zip(X_train, y_train))
+            )
+            X_bootstrap, y_bootstrap = zip(*bootstrap_sample)
+            X_oob, y_oob = zip(*oob_sample)
+
+            # Random feature selection
+            if self.m == "sqrt":
+                max_features = int(np.sqrt(n_features))
+            elif self.m == "log2":
+                max_features = int(np.log2(n_features))
+            else:
+                max_features = self.m
+
+            # Ensure max_features is not greater than n_features
+            max_features = min(max_features, n_features)
+
+            feature_indices = compute_random_subset(
+                list(range(n_features)), max_features
+            )
+            self.feature_indices.append(feature_indices)
+
+            # Train a decision tree on the bootstrap sample
+            tree = MyDecisionTreeClassifier()
+            X_bootstrap_subset = [[x[i] for i in feature_indices] for x in X_bootstrap]
+            tree.fit(X_bootstrap_subset, y_bootstrap)
+            self.trees.append(tree)
+
+            # Evaluate the tree using the out-of-bag sample
+            X_oob_subset = [[x[i] for i in feature_indices] for x in X_oob]
+            y_pred_oob = tree.predict(X_oob_subset)
+            accuracy = sum(
+                1 for y_true, y_pred in zip(y_oob, y_pred_oob) if y_true == y_pred
+            ) / len(y_oob)
+            self.validation_accuracies.append(accuracy)
+
+        # Select the M most accurate trees
+        if self.M is not None:
+            top_trees_indices = np.argsort(self.validation_accuracies)[-self.M :]
+            self.trees = [self.trees[i] for i in top_trees_indices]
+            self.feature_indices = [self.feature_indices[i] for i in top_trees_indices]
+
+    def predict(self, X_test):
+        """Predicts the class labels for the provided test data.
+
+        Args:
+            X_test (list of list of obj): The list of testing samples.
+
+        Returns:
+            list of obj: The predicted class labels.
+        """
+        predictions = []
+        for tree, feature_indices in zip(self.trees, self.feature_indices):
+            X_test_subset = [[x[i] for i in feature_indices] for x in X_test]
+            predictions.append(tree.predict(X_test_subset))
+
+        # Aggregate predictions (majority vote)
+        y_pred = []
+        for i in range(len(X_test)):
+            votes = [pred[i] for pred in predictions]
+            majority_vote = Counter(votes).most_common(1)[0][0]
+            y_pred.append(majority_vote)
+
+        return y_pred

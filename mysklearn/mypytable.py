@@ -239,7 +239,7 @@ class MyPyTable:
 
     def remove_rows_with_missing_values(self):
         """Remove rows from the table data that contain a missing value ("NA")."""
-        self.data = [row for row in self.data if "NA" not in row]
+        self.data = [row for row in self.data if "NA" not in row or None not in row]
 
     def replace_missing_values_with_column_average(self, col_name):
         """For columns with continuous data, fill missing values in a column
@@ -344,15 +344,9 @@ class MyPyTable:
             else:
                 other_table_dict[key] = [row]
 
-        # Debug: Print the other_table_dict
-        print("other_table_dict:", other_table_dict)
-
         # Perform the inner join
         for row in self.data:
             key = tuple(row[self.column_names.index(col)] for col in key_column_names)
-
-            # Debug: Print the current key
-            print("Current key:", key)
 
             if key in other_table_dict:
                 for other_row in other_table_dict[key]:

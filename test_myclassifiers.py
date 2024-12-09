@@ -1,6 +1,7 @@
 # pylint: skip-file
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import pytest
 
 from mysklearn.mysimplelinearregressor import MySimpleLinearRegressor
 from mysklearn.myclassifiers import (
@@ -8,7 +9,8 @@ from mysklearn.myclassifiers import (
     MyKNeighborsClassifier,
     MyDummyClassifier,
     MyNaiveBayesClassifier,
-    MyDecisionTreeClassifier
+    MyDecisionTreeClassifier,
+    MyRandomForestClassifier,
 )
 
 
@@ -65,7 +67,8 @@ def test_kneighbors_classifier_fit():
     assert knn.X_train == X_train
     assert knn.y_train == y_train
 
-'''
+
+"""
 def test_kneighbors_classifier_kneighbors():
     # Test case 1: 4 instance training set example
     X_train = [[1, 1], [1, 0], [0.33, 0], [0, 0]]
@@ -151,7 +154,8 @@ def test_kneighbors_classifier_kneighbors():
 
     assert np.allclose(distances, expected_distances, atol=0.01)
     assert neighbor_indices == expected_indices
-'''
+"""
+
 
 def test_kneighbors_classifier_predict():
     # Test case 1: 4 instance training set example
@@ -508,7 +512,8 @@ def test_naive_bayes_classifier_fit():
                     actual_posterior, expected_posterior, atol=0.001
                 ), f"Posterior for {attr}={attr_value} | {label} does not match in train example"
 
-'''
+
+"""
 def test_naive_bayes_classifier_predict():
     # Testing In-Class example
     X_test_inclass_example = [[1, 5], [2, 6]]
@@ -559,73 +564,89 @@ def test_naive_bayes_classifier_predict():
     assert (
         predictions_bramer_exercise == expected_predictions_bramer_exercise
     ), f"Bramer 3.6 exercise predictions do not match: {predictions_bramer_exercise} vs {expected_predictions_bramer_exercise}"
-'''
+"""
+
+X_train_interview = [
+    ["Senior", "Java", "no", "no"],
+    ["Senior", "Java", "no", "yes"],
+    ["Mid", "Python", "no", "no"],
+    ["Junior", "Python", "no", "no"],
+    ["Junior", "R", "yes", "no"],
+    ["Junior", "R", "yes", "yes"],
+    ["Mid", "R", "yes", "yes"],
+    ["Senior", "Python", "no", "no"],
+    ["Senior", "R", "yes", "no"],
+    ["Junior", "Python", "yes", "no"],
+    ["Senior", "Python", "yes", "yes"],
+    ["Mid", "Python", "no", "yes"],
+    ["Mid", "Java", "yes", "no"],
+    ["Junior", "Python", "no", "yes"],
+]
+y_train_interview = [
+    "False",
+    "False",
+    "True",
+    "True",
+    "True",
+    "False",
+    "True",
+    "False",
+    "True",
+    "True",
+    "True",
+    "True",
+    "True",
+    "False",
+]
+X_test_interview = [["Senior", "Java", "no", "yes"], ["Junior", "R", "yes", "yes"]]
+y_test_interview = ["False", "False"]
+
+
 def test_decision_tree_classifier_predict():
-    # Test case 1: "interview" dataset
-    X_train_interview = [
-        ["Senior", "Java", "no", "no"],
-        ["Senior", "Java", "no", "yes"],
-        ["Mid", "Python", "no", "no"],
-        ["Junior", "Python", "no", "no"],
-        ["Junior", "R", "yes", "no"],
-        ["Junior", "R", "yes", "yes"],
-        ["Mid", "R", "yes", "yes"],
-        ["Senior", "Python", "no", "no"],
-        ["Senior", "R", "yes", "no"],
-        ["Junior", "Python", "yes", "no"],
-        ["Senior", "Python", "yes", "yes"],
-        ["Mid", "Python", "no", "yes"],
-        ["Mid", "Java", "yes", "no"],
-        ["Junior", "Python", "no", "yes"]
-    ]
-    y_train_interview = ["False", "False", "True", "True", "True", "False", 
-                         "True", "False", "True", "True", "True", "True", 
-                         "True", "False"]
-    
     dt_classifier = MyDecisionTreeClassifier()
     dt_classifier.fit(X_train_interview, y_train_interview)
 
-    X_test_interview = [
-        ["Senior", "Java", "no", "yes"],
-        ["Junior", "R", "yes", "yes"]
-    ]
-    y_test_interview = ["False", "False"]
     y_pred_interview = dt_classifier.predict(X_test_interview)
-    assert y_pred_interview == y_test_interview, f"Error in predictions: {y_pred_interview} vs {y_test_interview}"
+    assert (
+        y_pred_interview == y_test_interview
+    ), f"Error in predictions: {y_pred_interview} vs {y_test_interview}"
+
 
 def test_decision_tree_classifier_predict():
-    X_train_interview = [
-        ["Senior", "Java", "no", "no"],
-        ["Senior", "Java", "no", "yes"],
-        ["Mid", "Python", "no", "no"],
-        ["Junior", "Python", "no", "no"],
-        ["Junior", "R", "yes", "no"],
-        ["Junior", "R", "yes", "yes"],
-        ["Mid", "R", "yes", "yes"],
-        ["Senior", "Python", "no", "no"],
-        ["Senior", "R", "yes", "no"],
-        ["Junior", "Python", "yes", "no"],
-        ["Senior", "Python", "yes", "yes"],
-        ["Mid", "Python", "no", "yes"],
-        ["Mid", "Java", "yes", "no"],
-        ["Junior", "Python", "no", "yes"]
-    ]
-    y_train_interview = ["False", "False", "True", "True", "True", "False",
-                         "True", "False", "True", "True", "True", "True",
-                         "True", "False"]
-
     dt_classifier = MyDecisionTreeClassifier()
     dt_classifier.fit(X_train_interview, y_train_interview)
-
-    # Define test cases
-    X_test_interview = [
-        ["Senior", "Java", "no", "yes"],
-        ["Junior", "R", "yes", "yes"]
-    ]
-    y_test_interview = ["False", "False"]
 
     # Perform prediction
     y_pred_interview = dt_classifier.predict(X_test_interview)
 
     # Validate predictions
-    assert y_pred_interview == y_test_interview, f"Error in predictions: {y_pred_interview} vs {y_test_interview}"
+    assert (
+        y_pred_interview == y_test_interview
+    ), f"Error in predictions: {y_pred_interview} vs {y_test_interview}"
+
+
+def test_random_forest_classifier_fit():
+    rf = MyRandomForestClassifier(n=20, m=2, f=4, M=7, random_state=42)
+    rf.fit(X_train_interview, y_train_interview)
+
+    assert len(rf.trees) == 7
+    assert len(rf.feature_indices) == 7
+    for tree in rf.trees:
+        assert isinstance(tree, MyDecisionTreeClassifier)
+
+
+def test_random_forest_classifier_predict():
+    rf = MyRandomForestClassifier(n=20, m=2, f=4, M=7, random_state=42)
+    rf.fit(X_train_interview, y_train_interview)
+    y_pred = rf.predict(X_test_interview)
+
+    print(f"Predictions: {y_pred}")
+    print(f"Expected: {y_test_interview}")
+
+    assert len(y_pred) == len(X_test_interview)
+    assert (
+        y_pred == y_test_interview
+    ), f"Error in predictions: {y_pred} vs {y_test_interview}"
+
+
+pytest.main()
