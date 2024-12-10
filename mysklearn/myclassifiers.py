@@ -548,6 +548,14 @@ class MyDecisionTreeClassifier:
 
 
 def compute_bootstrapped_sample(table):
+    """Bootstrap samples for random forest tree splits
+
+    Args:
+        table (MyPyTable): MyPyTable dataset that will be split using bootstrap technique
+
+    Returns:
+        _type_: _description_
+    """
     n = len(table)
     sampled_indexes = [np.random.randint(0, n) for _ in range(n)]
     sample = [table[index] for index in sampled_indexes]
@@ -557,6 +565,15 @@ def compute_bootstrapped_sample(table):
 
 
 def compute_random_subset(values, num_values):
+    """Computes random subset for random forests
+
+    Args:
+        values (list): list of values that the subset will be created from
+        num_values (int): number of values in the subset
+
+    Returns:
+        list: returns subset of size num_values from values
+    """
     values_copy = values[:]  # Create a shallow copy
     np.random.shuffle(values_copy)
     return values_copy[:num_values]

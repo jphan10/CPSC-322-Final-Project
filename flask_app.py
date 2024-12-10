@@ -8,7 +8,7 @@ from flask import request
 
 app = Flask(__name__)
 
-with open("nb_model.pkl", "rb") as model_file:
+with open("models/nb_model.pkl", "rb") as model_file:
     nb_classifier = pickle.load(model_file)
 
 
