@@ -119,3 +119,80 @@ def calculate_winners(table):
             winners.append(0)
 
     return winners
+
+
+def preprocess_data(X, bins=5):
+    """Preprocesses the dataset by discretizing numeric attributes.
+
+    Args:
+        X (list of list of obj): The dataset to preprocess.
+        bins (int): The number of bins to create for discretization.
+
+    Returns:
+        list of list of str: The preprocessed dataset with categorical values.
+    """
+    X_transposed = list(zip(*X))
+    X_discretized = []
+    for col in X_transposed:
+        try:
+            # Attempt to convert the column to floats
+            col = [float(value) for value in col]
+            discretized_col = discretize_column(col, bins)
+            X_discretized.append(discretized_col)
+        except ValueError:
+            # If conversion fails, keep the column as is
+            X_discretized.append(col)
+    return list(zip(*X_discretized))
+
+
+def discretize_column(column, bins):
+    """Discretizes a numeric column into categorical bins.
+
+    Args:
+        column (list of numeric): The numeric column to discretize.
+        bins (int): The number of bins to create.
+
+    Returns:
+        list of str: The discretized column with categorical values.
+    """
+    min_val = min(column)
+    max_val = max(column)
+    bin_width = (max_val - min_val) / bins
+    bin_edges = [min_val + i * bin_width for i in range(bins + 1)]
+
+    discretized_column = []
+    for value in column:
+        for i in range(bins):
+            if bin_edges[i] <= value < bin_edges[i + 1]:
+                discretized_column.append(f"bin_{i}")
+                break
+        else:
+            discretized_column.append(f"bin_{bins - 1}")
+
+    return discretized_column
+
+
+from mysklearn.mypytable import MyPyTable
+
+
+def filter_by_season_range(table, start_season, end_season):
+    """Filters the dataset to only include instances within the specified range of seasons.
+
+    Args:
+        table (MyPyTable): The input dataset.
+        start_season (int): The starting season (inclusive).
+        end_season (int): The ending season (inclusive).
+
+    Returns:
+        MyPyTable: A new MyPyTable containing only the instances within the specified range of seasons.
+    """
+    # Find the index of the "season" column
+    season_col_index = table.column_names.index("season")
+
+    # Filter the data to include only rows within the specified range of seasons
+    filtered_data = [
+        row for row in table.data if start_season <= row[season_col_index] <= end_season
+    ]
+
+    # Return a new MyPyTable with the filtered data
+    return MyPyTable(column_names=table.column_names, data=filtered_data)

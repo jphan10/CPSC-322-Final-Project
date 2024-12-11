@@ -426,7 +426,6 @@ class MyDecisionTreeClassifier:
         """
 
         def classify(instance, subtree):
-            """Traverse the tree to classify a single instance."""
             if subtree[0] == "Leaf":
                 return subtree[1]
 
@@ -439,8 +438,12 @@ class MyDecisionTreeClassifier:
 
             # Handle unseen attribute values
             leaf_nodes = [child[2] for child in subtree[2:] if child[2][0] == "Leaf"]
-            majority_leaf = max(leaf_nodes, key=lambda leaf: leaf[2])
-            return majority_leaf[1]
+            if leaf_nodes:
+                majority_leaf = max(leaf_nodes, key=lambda leaf: leaf[2])
+                return majority_leaf[1]
+            else:
+                # If no leaf nodes are found, return the most common class in the training data
+                return Counter(self.y_train).most_common(1)[0][0]
 
         return [classify(instance, self.tree) for instance in X_test]
 
