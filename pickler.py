@@ -17,11 +17,12 @@ from mysklearn.mypytable import MyPyTable
 import mysklearn.myclassifiers
 
 importlib.reload(mysklearn.myclassifiers)
-from mysklearn.myclassifiers import MyNaiveBayesClassifier
+from mysklearn.myclassifiers import MyDecisionTreeClassifier
 
 import mysklearn.myevaluation
 
 importlib.reload(mysklearn.myevaluation)
+import mysklearn.myevaluation as myevaluation
 
 import mysklearn.mysimplelinearregressor
 
@@ -30,8 +31,12 @@ importlib.reload(mysklearn.mysimplelinearregressor)
 train = MyPyTable().load_from_file("input_data/nba_elo.csv")
 test = MyPyTable().load_from_file("input_data/nba_elo_latest.csv")
 
+
+train = MyPyTable().load_from_file("input_data/nba_elo.csv")
+test = MyPyTable().load_from_file("input_data/nba_elo_latest.csv")
+
 train.drop_duplicate_seasons(2021)
-small_train = train.random_down_sample(num_rows=10000)
+small_train = train.random_down_sample(num_rows=60000)
 # First we will calculate the winners
 train_winner = myutils.calculate_winners(small_train)
 test_winner = myutils.calculate_winners(test)
@@ -53,14 +58,16 @@ train_attributes = [
 
 attribute_indexes = [small_train.column_names.index(attr) for attr in train_attributes]
 
-X_train = [[row[index] for index in attribute_indexes] for row in small_train.data]
-y_train = [row[-1] for row in small_train.data]
+X = [[row[index] for index in attribute_indexes] for row in small_train.data]
+y = small_train.get_column("winner")
 
-X_test = [[row[index] for index in attribute_indexes] for row in test.data]
-y_test = [row[-1] for row in test.data]
+X_train, X_test, y_train, y_test = myevaluation.train_test_split(X, y)
 
-naive_bayes = MyNaiveBayesClassifier()
-naive_bayes.fit(X_train, y_train)
+X_train_discretized = myutils.preprocess_data(X_train)
+X_test_discretized = myutils.preprocess_data(X_test)
+
+naive_bayes = MyDecisionTreeClassifier()
+naive_bayes.fit(X_train_discretized, y_train)
 
 with open("nb_model.pkl", "wb") as model_file:
     pickle.dump(naive_bayes, model_file)

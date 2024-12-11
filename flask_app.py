@@ -42,8 +42,13 @@ def submit():
             score2,
         ]
         prediction = nb_classifier.predict([features])[0]
-    print("prediction:", prediction)
-    return render_template("index.html", prediction=prediction)
+        result_string = ""
+        if prediction == 0:
+            result_string = "Team 2 wins!"
+        else:
+            result_string = "Team 1 wins!"
+    print("prediction:", result_string)
+    return render_template("index.html", prediction=result_string)
 
 
 @app.route("/hello", methods=["GET"])
